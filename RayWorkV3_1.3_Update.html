@@ -111,7 +111,13 @@ mark { background: var(--mark); color: var(--mark-ink); border-radius: 2px; padd
 
 /* ---------- masthead ---------- */
 .masthead { background: var(--surface); border-bottom: 1px solid var(--line); }
-.masthead .wrap { padding-block: 44px 28px; }
+.masthead .wrap { padding-block: 22px 28px; }
+.back {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 22px;
+  font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none;
+}
+.back:hover { color: var(--accent); }
 .eyebrow {
   display: flex; align-items: center; gap: 10px;
   font-family: var(--font-mono); font-size: 12px; font-weight: 500;
@@ -409,6 +415,10 @@ pre code { background: none; border: 0; padding: 0; font-size: inherit; overflow
 
 <header class="masthead">
   <div class="wrap">
+    <a class="back" href="./">
+      <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden="true"><path d="M13 5H1.5M5 1L1 5l4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      버전 선택
+    </a>
     <p class="eyebrow">
       <svg width="34" height="12" viewBox="0 0 34 12" aria-hidden="true"><path d="M1 11V1h4v10h3V1h4v10h3V1h4v10h3V6h3v5h2V8h2v3h1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
       RayWorkV3 · Release Notes

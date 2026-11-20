@@ -12,8 +12,7 @@
 <!--
   버전 추가/활성화 방법
   - 새 버전 페이지를 만들면 아래 .versions 안의 카드를 복사해 href 와 data-src 를 그 페이지 파일명으로 바꿉니다.
-  - 1.2 이력 페이지가 생기면 1.2 카드의 <div class="ver is-pending"> 를
-    <a class="ver" href="RayWorkV3_1.2_Update.html" data-src="RayWorkV3_1.2_Update.html"> 로 바꾸고 1.3 카드와 같은 구성으로 채웁니다.
+  - 이력 페이지가 아직 없는 버전은 <div class="ver is-pending" aria-disabled="true"> 카드(배지 "준비 중")로 둡니다.
   - 카드의 최신 빌드·최종 갱신·건수는 연결된 페이지의 UPDATES 데이터에서 자동으로 읽어옵니다.
 -->
 <style>
@@ -178,15 +177,21 @@ a.ver:hover .ver-cta svg { transform: translateX(3px); }
   <p class="lede">버전을 선택하면 해당 버전의 기능 추가, 개선·변경, 버그 수정 내역을 볼 수 있습니다.</p>
 
   <div class="versions">
-    <!-- RayWorkV3 1.2 : 이력 페이지 준비 중 -->
-    <div class="ver is-pending" aria-disabled="true">
+    <!-- RayWorkV3 1.2 -->
+    <a class="ver" href="RayWorkV3_1.2_Update.html" data-src="RayWorkV3_1.2_Update.html">
       <div class="ver-top">
         <span class="ver-name">RayWorkV3_1.2</span>
-        <span class="badge badge-pending">준비 중</span>
       </div>
-      <p class="ver-num">1.2<small>.x</small></p>
-      <p class="ver-note">업데이트 이력이 아직 등록되지 않았습니다.</p>
-    </div>
+      <p class="ver-num">1.2<small>.0.x</small></p>
+      <dl class="ver-meta">
+        <div><dt>최신 빌드</dt><dd data-k="build">1.2.0.257</dd></div>
+        <div><dt>최종 갱신</dt><dd data-k="date">2026-11-18</dd></div>
+        <div><dt>업데이트</dt><dd data-k="count">38건</dd></div>
+      </dl>
+      <span class="ver-cta">업데이트 이력 보기
+        <svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path d="M1 6h15M11 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </a>
 
     <!-- RayWorkV3 1.3 -->
     <a class="ver" href="RayWorkV3_1.3_Update.html" data-src="RayWorkV3_1.3_Update.html">

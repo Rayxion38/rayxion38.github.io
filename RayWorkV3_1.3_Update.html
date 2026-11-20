@@ -488,7 +488,7 @@ pre code { background: none; border: 0; padding: 0; font-size: inherit; overflow
 
 <footer class="foot">
   <div class="wrap">
-    <p>출처: RayWorkV3 업데이트 이력 문서(2026-11), Release.txt 빌드 기록(1.3.1.42 – 1.3.1.134), RayWorkV3_1.3 저장소 main 브랜치 커밋 기록(1.3.1.135 – 1.3.1.138)</p>
+    <p>출처: RayWorkV3 업데이트 이력 문서(2026-11), Release.txt 빌드 기록(1.3.1.42 – 1.3.1.134), RayWorkV3_1.3 저장소 main 브랜치 커밋 기록(Release.txt에 없는 빌드)</p>
     <p>시각은 빌드 기록 기준입니다. 빌드 번호가 기록되지 않은 항목은 '빌드 미기재'로 표시합니다.</p>
   </div>
 </footer>
@@ -610,6 +610,7 @@ const UPDATES = [
       ['증상', 'End Pulse 3단계(30/20/10%) 설정 시 마지막 2펄스만 30%, 20%로 내려가고 10% 단계는 출력되지 않음'],
       ['원인', '마지막 구간의 펄스 수를 1개 많게 계산하여 End Pulse 단계가 한 칸씩 뒤로 밀림'],
       ['수정', '펄스 수 계산을 보정하고, 끝에 남는 짧은 조각도 마지막 단계 파워로 출력'],
+      ['추가 수정 (16:45)', 'End Pulse를 쓰는 샷에서 끝에 남는 1점이 새 펄스로 처리되어 LaserOn 신호가 약 10㎲ 튀던 현상 제거 (끝 1점은 ON 트리거를 내지 않음). End Pulse를 쓰지 않는 샷은 기존 동작 그대로'],
     ],
     extra: 'ramp',
     facts: { '대상 프로그램': 'RayWorkV3 (RayBuilder / RayRunner)', '변경 파일': 'RayWorkV3.dll', '브랜치': 'Main' },
@@ -731,12 +732,29 @@ const UPDATES = [
     items: ['LDD Gap 판정 시 인터버스바 번들 뒤의 일반 번들이 인터버스바 두께로 판정되던 문제 수정', 'APA 추적 결과를 기록하고 테스트할 수 있는 기능 추가'],
   },
   {
+    date: '2026-10-06', time: '16:54', build: '1.3.1.129', types: ['fix', 'change'],
+    items: [
+      '교대 시간 사용 시 생산팩 수량이 교대 시각이 아니라 새 교대의 첫 팩 시작 시점에 초기화되도록 수정 (교대 직전 투입되어 교대 후 완료된 팩이 다음 교대 실적으로 잡히던 문제. 프로그램 재시작 후에도 교대 구분 유지)',
+      '교대 전환 시 파노라마 이미지 저장 팩 카운트도 초기화되어 교대 후 첫 팩은 항상 촬영',
+      ['주파수 모드 설정 창', 'Pulse Duty 입력을 레시피 패널에서 Power Slope (Frequency Wave) 창 안으로 이동하고 화면 이름을 Pulse Width(%)로 변경. Max Time 계산식과 대입 결과 표시 추가'],
+      ['주파수 모드 그래프', 'x축을 한 펄스 주기 전체(Time (us))로 표시하고 OFF 구간은 파워 0으로 표시, 축 제목 추가. 표 머리글을 CORE PWR(%) / CORE WATT(W)로 변경'],
+    ],
+  },
+  {
     date: '2026-09-28', time: '16:58', build: '1.3.1.128', types: ['add', 'change'],
     items: ['Gap 측정 알고리즘을 5번까지 추가', 'SaveAfterImage 실행 시 첫 번째 이미지는 항상 촬영하도록 변경'],
   },
   {
     date: '2026-09-22', time: '09:27', build: '1.3.1.127', types: ['change'],
     title: 'UseLive 음극 재용접 판정 방식 수정',
+  },
+  {
+    date: '2026-09-21', time: '13:55', build: '1.3.1.126', types: ['fix'],
+    items: [
+      '"Disconnected camera." 오알람 수정: 마지막 모션 파노라마 저장 후 카메라 라이브가 꺼진 채 DryRun이 끝나 다음 작업이 시작되지 않던 문제. DryRun 종료 시 라이브를 다시 켜도록 수정',
+      '카메라 라이브 확인이 한 번 실패하면 프로그램을 재시작할 때까지 풀리지 않아 모델 변경이 반영되지 않던 문제 수정 (정상 확인 시 자동 해제, 실패 시 갱신율 로그 기록)',
+      '재용접 시 파워 0으로 지나간(실제 용접하지 않은) 심이 UI에서 약용접으로 집계되던 문제 수정',
+    ],
   },
   {
     date: '2026-09-17', time: '19:50', build: '1.3.1.125', types: ['change', 'add', 'fix'],
@@ -753,12 +771,158 @@ const UPDATES = [
     title: 'LDD Control Interbusbar Reweld Template 추가',
   },
   {
+    date: '2026-09-10', time: '16:38', build: '1.3.1.124', types: ['add'],
+    lead: '09-07 주파수 모드 작업분을 메인 빌드에 병합',
+    items: [
+      ['주파수 모드 레시피', '주파수 모드에서는 레시피 패널에 Frequency(kHz, 최대 15) / Pulse Duty와 설정 버튼만 표시하고 일반 파워·슬로프 항목은 숨김. 설정 버튼으로 Power Slope (Frequency Wave) 창을 열어 한 펄스 ON 구간(Max Time = 1000 / Frequency × Pulse Duty / 100 us)의 파워를 최대 5단계로 편집'],
+      '주파수 모드 출력 시 마킹 경로를 10us 간격 점으로 나눠 스캐너로 출력 (점 간격으로 Mark Speed 유지)',
+      'SpiralSeam3 방향 화살표 색 구분 추가: 시작 화살표 초록, 끝 화살표 파랑 (회전 시 시작/끝 심 구분용)',
+    ],
+  },
+  {
     date: '2026-09-07', time: '18:40', build: '1.3.1.123', types: ['change'],
     title: '주파수 모드 2 변경 적용',
   },
   {
+    date: '2026-09-02', time: '14:44', build: '1.3.1.122', types: ['add', 'change', 'fix'],
+    site: '이랜텍',
+    title: 'SpiralSeam3 도형 추가, MES 재용접 보고 타임아웃 대응',
+    groups: [
+      { type: 'add', items: [
+        ['SpiralSeam3 도형', '스파이럴 심 2개를 위/아래로 배치하는 새 도형 (Seam Gap으로 간격 설정, 2×Radius보다 작으면 겹치지 않게 자동 보정). 심1 → 심2 순서로 용접하고 심 사이 연결 구간은 파워 0으로 이동해 중복 용접 방지'],
+        'SpiralSeam3 심1(위) / 심2(아래) 독립 파워 슬로프 편집 창 추가 (레시피에 저장)',
+        'SpiralSeam3 재용접 결과를 MES에 심1 / 심2 동일 값으로 보고 (Retry Seam1/Seam2 검증 포함)',
+        'MES 전송 실패 재시도에 총 경과시간 상한 추가 (기본 600초)',
+      ] },
+      { type: 'change', items: [
+        'SS2 파워 슬로프 저장 위치를 도형에서 레시피로 변경: 같은 색(레시피)의 SS2 전체에 일괄 적용. 기존 잡의 도형별 슬로프는 불러올 때 레시피로 자동 이관',
+        '재용접 회차마다 전체 모션 기본값을 MES에 미리 채워 보내지 않고 실제 작업분만 보고하도록 변경 (재용접 3회차부터 SP_Result01 보고가 타임아웃되던 문제 대책). 이전 회차 데이터가 없는 심은 본용접 대상으로 판정',
+        'MES SP 명령 타임아웃 120초 → 300초 상향 (접속 확인 타임아웃은 120초 유지)',
+        '재용접 2회 적용 옵션 비활성화 (항상 꺼짐)',
+      ] },
+      { type: 'fix', items: [
+        'SS2 도형 중심이 기준점에서 벗어나 보이던 문제 수정',
+        'SS2 슬로프에 레시피가 적용되지 않던 문제 수정',
+      ] },
+    ],
+  },
+  {
+    date: '2026-08-27', time: '10:42', build: '1.3.1.121', types: ['fix', 'add', 'change'],
+    title: '이랜텍 MES 보고 보강(Emergency Stop·재용접 이력·Defect), 헤드 충돌·타임아웃 감시, LDD 템플릿 검증 개선',
+    groups: [
+      { type: 'fix', items: [
+        'Emergency Stop 등 알람 정지 시 MES 완공보고(203) 데이터 손실 수정: 본용접도 완료한 모션까지 실측 반영, 용접 중이던 극성은 약용접으로 보고해 재용접 유도, 진행하지 않은 모션은 공백 유지, 완료 모션의 Defect도 함께 전달',
+        '알람 정지 시 203 전송 형식 오류 수정 (측정 항목 SETE 라벨 누락, 구분자가 문자 \'=\'로 나가던 문제)',
+        '재용접 회차 반복 시 이력 유실 수정: 이번 회차에 스킵된 모션은 실측이 있는 이전 회차 판정으로 판단 (이미 재용접한 모션을 미용접으로 오판해 본용접을 다시 하던 문제), Gap 판정도 동일 적용해 완료 모션의 불필요한 제로파워 주행 제거',
+        '재용접 중 E-stop 시 약용접 마킹이 203에 반영되지 않아 다음 회차에 본용접을 반복하던 문제 수정',
+        '재용접 팩 정상 완료 시 이번 회차에 처리하지 않은 모션의 이전 회차 데이터도 203에 병합 (누락 방지, @Defects는 이번 회차 완료 모션만)',
+        'DryRun 중 예외 발생 시 정상 완료로 처리되어 해당 헤드의 재용접 이력이 유실되던 문제 수정, 알람으로 LDD 결과가 취소된 경우의 예외 방지',
+        '좌표 동기화 진행창이 두 번째부터 뜨지 않던 문제와 진행 메시지 유실·창 조기 닫힘 수정',
+      ] },
+      { type: 'add', items: [
+        ['Head Peer Motion Timeout', '상대 헤드가 한 모션에서 설정 시간(초)을 넘겨 진행하지 못하면 다음 모션으로 이동하지 않고 양쪽 헤드 알람 정지 (자동 모드 옵션, 0=비활성 기본, 최소 10초). 1.3.1.120의 모션 인덱스 차이 알람은 재용접 시 오알람으로 숨김 처리'],
+        ['Work Time', 'NG 결과 뷰 위에 작업 시작/종료/총 소요시간 표시 ([Start DryRun]/[Finished DryRun] 로그와 같은 시각, 이랜텍 요청)'],
+        'MES @Defects에 측정값 첨부 및 형식 변경 (모션번호_극성_셀번호_심번호_심ID_코드 + 값, N/O=키홀 피크값, G=갭 측정값·셀당 1건)',
+        '측정 실패로 스킵된 모션도 Defect 보고 (APA 실패=A + APA 스코어, 포커싱 실패=F + 포커싱 결과, 모션당 1건). APA 실패 스코어가 항상 0으로 전송되던 문제 수정',
+        'MES 테스트 창에 Force Job Start(201) 강제 착공, Load Query File, Execute Query(저장된 쿼리로 수동 완공보고) 추가',
+        'LDD 템플릿 검증 창에 불일치 분류/사유 컬럼, 요약, 선행 단계(템플릿 적용) 실패 경고 추가, 검증 결과 CSV 저장 (LOG\\yyyyMMdd\\LDD). 템플릿 적용 항목별 진행/실패를 LDD Sync 창에 표시 (실패 줄 빨간색)',
+        'LDDController 잡 템플릿 속도 개선 옵션 추가 (2차 패스에서 값이 다른 항목만 재적용, 기본 꺼짐). RayBuilder와 LDDController 동시 배포 필요',
+        'LDD 옵션에 Use Trigger Check 추가 (용접 종료 후 트리거 하강 확인, 기본 사용). 장비 타입 DEAJEON_LAB은 트리거 하강 확인 생략',
+      ] },
+      { type: 'change', items: [
+        'RayRunner에서도 두 헤드 충돌 감시 동작 (모션 설정 Avoid Margin X/Y, 0이면 비활성). 좌표 계산 수정 및 마진 = 실제 정지 거리로 변경 — 같은 설정값이면 정지 거리가 기존의 절반이므로 기존 동작을 유지하려면 값을 2배로 설정',
+        'MES(SQL) 명령 타임아웃 30초 → 120초, 전송 재시도 5회 → 10회',
+        'MES 쿼리 로그를 통합 로그 대신 LOG\\yyyyMMdd\\MES\\{LotID}_{시각}_{쿼리}.log 파일로 별도 저장',
+        'Category NG Alarm(동일 카테고리 NG 연속 pack 알람) 기능과 옵션 UI 숨김',
+      ] },
+    ],
+  },
+  {
+    date: '2026-08-20', time: '17:43', build: '1.3.1.120', types: ['add', 'change', 'fix'],
+    title: '장비 타입 설정 도입, 이랜텍 MES Defect 코드 정리',
+    items: [
+      ['장비 설정', '옵션에 장비 설정 페이지 추가: 장비 타입(BASIC/INFAC/ELENTEC/EBL/DEAJEON_LAB/INFAC_REPAIR) 선택, 변경 후 재시작 필요'],
+      '통신 설정의 MES Type 콤보 삭제, MES 프로토콜은 장비 타입으로 결정 (ELENTEC=이랜텍, EBL=LG2, 그 외=LG). 기존 설정의 MES Type은 장비 타입으로 자동 변환',
+      '헤드 간 모션 인덱스 차이 알람 옵션 추가 (자동 모드 옵션, 0=비활성 기본, 최소 3): 한쪽 헤드가 설정값 이상 앞서면 양쪽 헤드 현재 모션 완료 후 알람 정지',
+      '이랜텍 MES Defect 코드를 회차와 무관하게 G(갭 NG) / N(약용접) / O(과용접)로 단순화',
+      '이랜텍 MES Defect에 이번 사이클에 실제로 용접한 결과(LDD 판정 NOK)만 포함 — OK 값이나 이전 이력이 불량으로 올라가던 문제 수정',
+      '음극 과/약용접 판정에 양극 키홀 스펙(KeyholeSpecPos)을 쓰던 문제 수정 (극성별 키홀 스펙 적용)',
+      '마지막 모션에서 정지/알람으로 취소된 경우 DryRun이 정상 완료로 처리되던 문제 수정',
+      '좌표 동기화 시 생성되는 SyncAll 파일(xml/csv/gpi)을 로그 날짜 폴더(LDDSync)로 이동해 보존기간이 지나면 자동 삭제',
+    ],
+  },
+  {
+    date: '2026-08-13', time: '08:46', build: '1.3.1.119', types: ['add', 'change', 'fix'],
+    title: '연속 NG 알람, 데이터 자동삭제, 교대별 생산수량, 헤드 알람 정지 개선, MES 재연결',
+    groups: [
+      { type: 'add', items: [
+        ['Category NG Alarm', 'GAP / 약용접 / 과용접 중 같은 종류의 NG가 있는 pack이 설정 수 이상 연속되면 설비 정지 알람 (자동 모드 옵션, 기본 3, 0 = 비활성). OK pack이 나오면 카운트 초기화'],
+        ['Data Auto Delete', '로그 / 이미지 / SensorLog 자동삭제 기간 설정 추가 (자동 모드 옵션, 0 = 비활성, 최소 100일). 날짜 폴더·파일 기준으로 하루 1회 정리. 기존 고정 삭제(로그 100일, SensorLog 365일)는 이 설정으로 대체되어 기본값 0에서는 삭제하지 않음'],
+        ['Shift Time', '교대 시간 설정 추가 (자동 모드 옵션). 사용 시 Welder 자동 화면에 생산수량(pack) 표시, 지정한 교대 시각(10분 단위, 기본 08:30 / 20:30)마다 0으로 초기화. 프로그램을 다시 켜도 수량 유지'],
+        'APBA 포인트를 모두 소진하면 PLC 교체 신호와 함께 PC 알람도 발생',
+        'APA 검색 실패 시 참고용 최고 후보 점수(FailScore) 로그 기록',
+        '샘플심 실행 시 키홀 / Gap 로그에 [Sample Seam] 식별 표시 추가, 측정 데이터가 없는 빈 로그 블록은 남기지 않음',
+      ] },
+      { type: 'change', items: [
+        ['헤드 알람 정지', '서보 / 레이저 / 스캐너 / PD 센서 / 냉각수 등 헤드별 알람 시 알람 난 헤드만 즉시 정지하고, 반대 헤드는 진행 중인 모션을 마친 뒤 정지 (비상정지·사용자 정지는 기존대로 양쪽 즉시 정지). Busy / End / Ready 출력은 양쪽 헤드가 모두 멈춘 뒤 OFF'],
+        '헤드 간 충돌 방지 인터락 추가: 한 헤드가 에러로 정지하면 반대 헤드도 다음 모션으로 이동하지 않고 정지, 헤드 동기화 대기 중 정지되면 이동 전에 중단',
+        '헤드 Move / Weld 출력(IO)을 작업 상태에 맞춰 매번 갱신하고, 정지 후 안전 위치 이동이 끝나면 OFF (신호 잔류 방지)',
+        ['MES 재연결', '이랜텍 MES(SQL) 전송 실패 시 연결을 초기화하고 대기 시간을 늘려가며 재시도, 연결이 끊기면 프로그램 재시작 없이 5~30초 간격으로 자동 재연결. SQL 오류 원인 상세 로그 추가'],
+        '재용접 시 이번에 용접하지 않은(이전 OK) 심의 MES 측정값을 0 대신 MES 202로 받은 이전 결과보고 값으로 채워 전송',
+        'Save After Image 사용 시 용접이 끝난 위치에서 모션마다 바로 촬영하도록 변경 (작업 후 헤드 재이동 촬영 없음). Save Skip Count 추가: 설정한 pack 수만큼 건너뛰고 촬영하며, 건너뛴 pack도 NG 모션과 재용접 모션은 촬영. 옵션이 꺼져 있을 때 NG / 재용접 이미지를 저장하던 동작은 충돌 위험으로 제거',
+        'APA 트래킹 보정량이 한계값을 초과하면 설정된 재시도 횟수만큼 다시 검사',
+        'LDD 측정 트리거 완료 대기를 최대 1초 제한 방식에서 트리거 확인까지 기다리는 방식으로 변경 (짧은 트리거 신호 누락 방지)',
+        'PDSensor 로그 저장 위치를 로그 폴더의 날짜 폴더 아래(PDSensorLog)로 변경 (자동삭제 대상에 포함)',
+      ] },
+      { type: 'fix', items: [
+        '미용접(NO_WELDING)으로 스킵된 모션이 MES에 기록되지 않아 APA 2회 실패 후 재작업이 수행되지 않던 문제 수정 (MES 사용 시 항상 기록)',
+        'APBA 실패 후 알람이 남아 있는 상태에서 작업이 시작되던 문제 수정 (알람 리셋 전에는 작업 시작 차단)',
+        'APBA Start / End Z 또는 위치를 바꿔도 포인트 개수가 같으면 저장되지 않던 문제 수정',
+        '모션 이동 120초 타임아웃이 동작하지 않던 문제 수정',
+        '반복 사이클에서 이전 이동이 끝나기 직전에 다음 이동 명령이 들어가 "has driving status" 알람으로 정지하던 문제 수정 (최대 50ms 대기)',
+        'APA 검색 영역 중심 Y 좌표 계산 오류 수정',
+        '트래킹 모델 형상 복사 시 일부 설정이 누락되던 문제 수정',
+      ] },
+    ],
+  },
+  {
+    date: '2026-07-24', time: '09:15', build: '1.3.1.118', types: ['add', 'change'],
+    title: '주파수 모드(Frequency Mode) 추가',
+    items: [
+      ['Frequency Mode', '레이저 옵션에 추가 (옵션, 기본 꺼짐). 켜면 RayBuilder 형상 속성에 Frequency(kHz) / Pulse Duty(%) 항목이 표시되고, 레시피별 값을 RTC6 펄스 출력에 적용 (기본 10kHz / 50%)'],
+      'RTC6 초기화 시 레이저 모드와 대기(standby) 신호 설정 변경 (주파수 모드 대응)',
+      'IPG YLP / COHERENT 레이저의 아날로그 파워 출력 상한을 전체 범위로 변경 (YLS / YLR-CW와 동일)',
+      'COHERENT 레이저는 샷 작업 후 Laser Off를 보내지 않도록 변경',
+    ],
+  },
+  {
+    date: '2026-07-14', time: '16:44', build: '1.3.1.117', types: ['change'],
+    items: [
+      'HelioScan 사용 시 RTC 스캐너 케이블 상태 모니터링을 제거하고 HelioScan 전용 모니터링만 동작 (RayBuilder 용접 Seam 화면의 Scan Head Status 표시 숨김)',
+      '단일 설비(UseSingleMachine)의 Scanner Head 케이블 끊김 알람을 HelioScan X / Y 축 알람 기준으로 판정',
+    ],
+  },
+  {
     date: '2026-07-03', time: '10:11', build: '1.3.1.116', types: ['add'],
     title: '반원 토네이도 추가',
+  },
+  {
+    date: '2026-06-25', time: '20:11', build: '1.3.1.115', types: ['fix', 'change'],
+    site: '이랜텍',
+    items: [
+      'MES 작업 시작 보고(201)가 NG로 알람이 뜬 상태에서 알람을 리셋하지 않으면 MES 요청이 무한 반복 전송되던 문제 수정 (알람 리셋 후 1회 재시도)',
+      '슬로프 사용 레시피의 키홀 로그 파워가 0W / 0%로 표시되던 문제 수정 (평균 / 피크 값 표시), 헤드별 파워 상한값 반영',
+      'Save After Image 저장 조건 변경: 켜면 NG 여부와 관계없이 전체 모션 저장, 꺼져 있어도 NG(미용접 / Gap NG / 약용접·과용접) 또는 재용접이면 저장',
+    ],
+  },
+  {
+    date: '2026-06-24', time: '13:52', build: '1.3.1.114', types: ['fix', 'change'],
+    site: '이랜텍',
+    items: [
+      'LDD 포커싱(WPH-FTAVG) 측정 실패 시 최대 3회 재측정, 끝까지 실패하면 해당 모션 용접 스킵 (양극은 미용접·재투입, 음극은 NG). 포커싱 실패로 Z 보정이 빠져 과용접되던 문제 방지',
+      '키홀 로그의 파워가 실제 출력과 달리 0W로 표시되던 문제 수정 (출력 %도 함께 기록)',
+      'LDD 포커싱 로그에 WPH-FTAVG 원본값과 성공 여부 기록',
+    ],
   },
   {
     date: '2026-06-24', time: '09:06', build: '1.3.1.113', types: ['change'],
@@ -769,7 +933,18 @@ const UPDATES = [
     items: ['노이즈 테스트에 파워 모드 추가', '캐논 스캐너 분해능 20bit 적용'],
   },
   {
-    date: '2026-06-19', time: '16:55', types: ['change'],
+    date: '2026-06-19', time: '16:57', build: '1.3.1.111', types: ['add', 'change'],
+    title: '좌표 뷰어 거리 측정·눈금자·RMS 표시',
+    lead: '아래 2026-06-19 키홀 로그 인터벌 수정도 이 빌드에 포함됩니다.',
+    items: [
+      ['좌표 뷰어 거리 측정', '거리 측정 체크 후 EyeShot 뷰에서 두 점을 클릭하면 가장 가까운 실측(시안) / 지령(주황) 점에 스냅해 두 점 사이 거리 표시. 초기화 버튼 추가'],
+      '좌표 뷰어 EyeShot 뷰에 눈금자 표시 추가',
+      '좌표 뷰어에 RMS 표시 추가: 실측 좌표의 반복 정밀도(±2σ, CEP95, µm) 표시',
+      '스캔헤드 상태 모니터링이 RTC6 스캐너일 때만 동작하도록 변경',
+    ],
+  },
+  {
+    date: '2026-06-19', time: '16:55', build: '1.3.1.111', types: ['change'],
     title: '키홀 로그의 인터벌 값도 mm 단위로 수정 (자재 두께 기준)',
   },
   {
@@ -779,6 +954,39 @@ const UPDATES = [
   {
     date: '2026-06-18', time: '20:20', build: '1.3.1.109', types: ['change'],
     title: 'DDO Gap 측정이 타임아웃되거나 알고리즘이 실패하면 GAP NG로 처리',
+  },
+  {
+    date: '2026-06-16', time: '12:00', build: '1.3.1.108', types: ['change', 'fix'],
+    items: [
+      '좌표 뷰어 시간축을 HelioScan 스캐너는 포인트당 20us, 그 외는 10us로 계산하도록 변경. 그래프 제목을 실측 X / 실측 Y / 지령 X / 지령 Y로 변경',
+      'Coordinate Verification의 Test delay(us) 적용 스케일 재조정',
+      '실측 좌표 mm 변환 시 소수 4자리 반올림 제거',
+      '파워 모니터링 Raw 저장 시 결과 데이터가 없으면 오류가 날 수 있던 문제 수정',
+    ],
+  },
+  {
+    date: '2026-06-15', time: '17:41', build: '1.3.1.107', types: ['change'],
+    items: [
+      'Coordinate Verification의 Test delay(us) 값이 실제 지연 시간에 맞도록 실측좌표 딜레이 스케일 조정',
+    ],
+  },
+  {
+    date: '2026-06-15', time: '15:34', build: '1.3.1.106', types: ['change', 'fix'],
+    items: [
+      '실측 좌표 변환을 헤드별 RTC 카드 기준으로 적용 (2번 헤드 대응)',
+      'HelioScan 스캐너의 실측 좌표 원시값을 변환 전에 디코딩하도록 수정',
+      'Test delay 적용 위치 계산 시 첫 포인트(0번)에서 지연이 들어가던 문제 수정',
+    ],
+  },
+  {
+    date: '2026-06-15', time: '14:02', build: '1.3.1.105', types: ['add', 'change', 'fix'],
+    title: '좌표 실측 변환, 반복 횟수 설정',
+    items: [
+      'Record Scanner Pos 결과(실측 / 지령 좌표)를 스캐너 보정 테이블로 역변환해 실제 좌표로 기록',
+      'Coordinate Verification에 반복횟수 추가: Record Scanner Pos 사용 시 지정 횟수만큼 반복 Shot (기본 1)',
+      '실측 좌표 mm 변환 시 부호가 반대로 나오던 문제 수정',
+      '좌표 뷰어 창 크기 확대, 실측 그래프 영역 확대',
+    ],
   },
   {
     date: '2026-06-15', time: '11:50', build: '1.3.1.104', types: ['change'],
@@ -803,6 +1011,35 @@ const UPDATES = [
   {
     date: '2026-05-29', time: '17:37', build: '1.3.1.99', types: ['change'],
     title: 'DDO 그래프 표시 개선',
+  },
+  {
+    date: '2026-05-28', time: '20:03', build: '1.3.1.98', types: ['add', 'change'],
+    groups: [
+      { type: 'add', items: [
+        'LDD 옵션에 Use SeamPair For LDD/RTC 추가 (옵션, 기본 꺼짐. 꺼짐 = 기존 방식, 켜면 Seam 0→1 병합)',
+        'LDD 옵션에 KHD FTNTP Threshold 입력 추가 (KHD-FTNTP 값이 임계값 이상이면 APBA 생략, 0 = 미사용)',
+        '레시피 Slope 스텝 편집에 Copy / Paste / Delete Sel 버튼 추가 (여러 행 선택, 중간 위치 붙여넣기·삭제 가능). 최대 스텝 수 100 → 10000',
+        '모니터링 보정 테스트 화면에 Center / Ring Analog Input(V) 원본 전압 표시 추가',
+      ] },
+      { type: 'change', items: [
+        'Ring PW Warn Min/Max, Z Offset Warn(mm) 설정을 LDD 옵션에서 Auto Mode 옵션의 Weld Alarm 항목으로 이동 (기존 LDD 옵션 값은 옮겨지지 않으므로 재입력 필요)',
+        'MES 상신 항목에 Ring 파워, LDD 초점 보정값(Z Offset) 전송 복구',
+        'LDDController 시작 시 설정 경로와 시퀀스 파일 목록을 로그에 기록하고, 시퀀스 파일을 못 찾으면 확인한 경로를 회신·로그에 남기도록 개선. LDD 좌표 동기화 결과와 실패 사유도 로그에 기록',
+      ] },
+    ],
+  },
+  {
+    date: '2026-05-28', time: '16:55', build: '1.3.1.97', types: ['fix', 'add', 'change'],
+    site: '대전기술원',
+    title: 'LDDController 파일 작업 실패 감지 및 진단 기능',
+    items: [
+      'LDDController에서 시퀀스 / Job 파일 작업(Set Job, Remove Job, Backup / Restore Seq)이 실패해도 성공으로 회신하던 문제 수정. 실패 시 사유와 함께 Failed를 회신하고 RayWork에서 LDD 오류로 처리',
+      'LDDController 파일 작업 시 읽기 전용 속성 자동 해제, 실제 반영 여부 확인 및 실패 사유 로그 기록',
+      'LDDController 트레이 메뉴에 진단... 창 추가 (Ctrl+D): 설정 경로 쓰기 권한 점검, 최근 파일 작업 결과, 로그 폴더 열기',
+      'SeamPair 기능 추가: 같은 레이어의 본용접 Seam 0→1 연속 쌍을 LDD/RTC에서 한 그룹으로 묶어 처리 (연결 구간은 파워 0, 재용접은 병합 안 함)',
+      '파워 보정 / 모니터링 보정 옵션 화면을 여는 것만으로 RTC·레이저를 점유하지 않고 실제 Shot / Guide 시점에 초기화하도록 변경 (LaserThread와 충돌해 프로그램이 종료될 수 있던 문제 대응)',
+      '파워 보정 / 모니터링 보정 옵션 화면을 열 때 설정 정보가 비어 있어 오류가 나던 문제 수정',
+    ],
   },
   {
     date: '2026-05-27', time: '19:26', build: '1.3.1.96', types: ['change', 'add'], site: '이랜텍',
@@ -878,6 +1115,18 @@ const UPDATES = [
     extra: 'camflow', keywords: '카메라 먹통 타임아웃 Bottom 스킵 Emergency Stop',
   },
   {
+    date: '2026-04-10', time: '17:03', build: '1.3.1.80', types: ['fix', 'change'],
+    title: '다중 APA 판정·영역 정리, 가이드 핀 모델 분리',
+    items: [
+      '다중 APA는 3개 영역을 모두 찾았을 때만 OK로 판정하도록 변경 (기존: 한 영역만 찾아도 OK)',
+      '다중 APA 평균 오프셋에 Laser Offset이 두 번 더해지던 문제 수정. 로그에 영역별 위치 대신 영역별 오프셋 표시',
+      '다중 APA Area2/Area3 검사 영역이 이미지 경계를 벗어나면 MIL 에러가 나던 문제 수정 (검사 영역을 이미지 안으로 보정). 검사 후 Area2/Area3 모델 이미지 메모리 해제',
+      '가이드 핀 모델을 다중 APA 영역 모델과 분리해 따로 저장하도록 변경 (기존 레시피 데이터는 불러올 때 자동 이전)',
+      '메인 화면 검사 결과 표시: 다중 APA일 때 Found n/3과 평균 오프셋(AvgOffsetX/Y) 표시',
+      'LDD APBA 창을 열면 LDD 설정의 Auto APBA Power / Point Time 값이 기본으로 입력되도록 변경',
+    ],
+  },
+  {
     date: '2026-04-08', time: '14:55', build: '1.3.1.79', types: ['add'],
     title: '다중 APA 로그 추가',
     items: ['다중 APA 적용 시 Offset 값 평균 로그 추가'],
@@ -894,6 +1143,109 @@ const UPDATES = [
   {
     date: '2026-02-04', time: '10:07', build: '1.3.1.67', types: ['change'], site: '이랜텍',
     title: '이랜텍 현장 적용 업데이트 버전',
+  },
+  {
+    date: '2025-10-31', time: '09:27', build: '1.3.1.50', types: ['add', 'change', 'fix'],
+    title: 'VRP LDD Focusing 도형 추가, 모션 위치 오차 검사, PLC 사용 옵션',
+    lead: '이랜텍·대전기술원 현장 작업 후 반영분 포함',
+    groups: [
+      { type: 'add', items: [
+        ['VRP 도형', 'Welding Seam 도구 모음에 VRP 도형 추가 (직선 형태, Shift로 수평/수직 고정). LDD 좌표 동기화와 LDD 시퀀스에 포함되어 LDD Focusing 경로로 사용되며 레이저 출력 0으로 스캔'],
+        '레시피 옵션에 VRP Recipe(Mark Speed, Jump Speed, Jump Delay, LaserOn Delay) 추가. 도형 속성에서 VRP 시작/끝점, 속도, Delay 편집',
+        'LDDController에 VRP 작업(.vrp) 처리와 VRP / Focus / 재용접(양극·음극) 템플릿 경로 설정 추가',
+        'Auto 모드 옵션에 Motion Position Error Spec(mm) 추가 (기본 0.1). 용접 전 X/Y/Z 위치 오차가 기준을 넘으면 Motion Position Error Alarm 로그 후 작업 중단',
+        '통신 설정에 PLC 사용(Enable) 체크 추가 (기본 꺼짐). 꺼져 있으면 RayBuilder/RayRunner가 PLC 통신을 시작하지 않음',
+        'Wobble 회전 방향 옵션(반시계 방향) 추가. 켜면 실제 스캐너 Wobble 회전 방향이 반대로 바뀌고 Welding Seam 화면 궤적에도 반영',
+        '도어 열림 또는 집진기 꺼짐으로 레이저를 쏠 수 없을 때 RayBuilder에 알림 창 표시',
+        'LDD Gap 측정 로그(CSV)에 도형별 최저 출력(CenterLow, RingLow) 열 추가',
+      ] },
+      { type: 'change', items: [
+        '모션 티칭의 이동 전 / 이동 후 Delay 시간이 실제 작업 동작에 적용되도록 변경 (기존에는 시뮬레이션에만 반영)',
+        'LDD Gap 측정 실패 시 해당 도형 결과를 NOK로 처리해 화면에 표시',
+        'LDD 시리얼 번호 초기화 실패 시 경고만 남기고 측정 계속 진행',
+        'Welding Seam 화면의 Wobble 궤적은 현재 레이어 도형에만 표시',
+        'LDD 옵션 Ref Plane Pos(LDD Focusing / LDD Gap) 입력 최대값 확대 (500000 → 5000000)',
+      ] },
+      { type: 'fix', items: [
+        '대전기술원 설비에서 도형 방향 화살표가 잘못 표시되던 문제 수정',
+      ] },
+    ],
+  },
+  {
+    date: '2025-10-21', time: '20:22', build: '1.3.1.48', types: ['add', 'change', 'fix'],
+    title: 'Overall View 2헤드 촬영, Wobble 궤적 표시, 사이드 블로워 버튼 수정',
+    groups: [
+      { type: 'add', items: [
+        'Overall View 옵션에 Type(Head1 / Both) 추가. Both 선택 시 Head1 영역 촬영 후 Head2 카메라로 전환해 Head2 영역 촬영 (Head2 Width, Head2 ZPosition 설정)',
+        'Overall View 촬영 위치 보정용 Offset X / Offset Y 설정 추가',
+        '파노라마 옵션 카메라 캘리브레이션에 GridSize(mm) 항목 표시',
+        'Welding Seam 화면에서 일반(원형) Wobble 궤적을 직선/원 도형 위에 표시하고, 예상 가공 시간에 Wobble 경로 길이 반영',
+      ] },
+      { type: 'change', items: [
+        'LDD Focusing 시 다시 도형 위치로 이동하고 자이로 센서 안정화를 기다린 뒤 측정하도록 원복 (1.3.1.47의 택타임 단축 방식 해제)',
+        '메인 화면과 스캐너 캘리브레이션 창의 조그 버튼이 헤드별 JogReverseX / JogReverseY 설정을 따르도록 변경',
+        'Dry Run 종료 후 안전 위치 대신 첫 번째 모션 위치로 이동',
+        '스캐너 체류 시간 감시 영역을 도형 외곽 대신 실제 스캔 좌표 기준으로 계산',
+        '십자 마킹(Cross Mark) 크기 확대 (20mm → 100mm)',
+        'Welding Seam 화면의 파노라마 이미지를 스캐너 필드 대신 작업 영역 크기 기준으로 표시',
+        '수동 APBA 실행 중 에어 블로워를 I/O 출력 대신 PLC 사이드 블로워로 제어',
+      ] },
+      { type: 'fix', items: [
+        'RayBuilder 리본의 Head2 Blower 버튼이 Head1 블로워를 제어하던 문제 수정',
+        'Welding Seam 창의 Side Blower 버튼이 동작하지 않던 문제 수정',
+        'Head2를 사용하지 않는 설비에서 모션 스캔 오류(motion scan error)로 RayBuilder가 종료되던 문제 수정',
+        'Ajin 모션 초기화 때 오창 파일럿 라인 전용 전자 기어비를 강제로 설정하던 부분 제거 (신규 설비 셋업 시 문제)',
+        'Scout 조그 창을 열 때 레이저 초기화 전에 스캐너 이동을 시도하던 문제 수정 (초기화 완료까지 최대 60초 대기)',
+        '레시피가 없는 도형의 위치를 바꿀 때 오류가 나던 문제 수정',
+      ] },
+    ],
+  },
+  {
+    date: '2025-09-23', time: '15:44', build: '1.3.1.47', types: ['add', 'change', 'fix'],
+    site: '이랜텍',
+    title: '이랜텍 현장 적용: Auto APBA, PLC 사이드 블로워·캘리브레이션 실린더, LDD Focusing 택타임 단축',
+    groups: [
+      { type: 'add', items: [
+        ['Auto APBA', 'APBA 위치로 이동 후 다음 미사용 포인트로 옮겨 LDD Focusing → 수평 검사(Level Check) → APBA 순으로 자동 실행. 수평 NG면 중단, 포인트를 모두 쓰면 PLC로 APBA Change 신호 출력'],
+        'RayRunner에 LDD APBA 버튼 추가 (확인 후 현재 헤드에서 Auto APBA 실행)',
+        'LDD 옵션 Auto APBA 항목에 Power(%), Point Time(ms) 추가 (RayRunner Auto APBA에 사용)',
+        'LDD APBA 창에 Manual(현재 위치에서 APBA), Clear and Create(APBA 포인트 초기화 후 재생성) 버튼 추가',
+        '통신 설정에 PLC 주소 추가: Calibration FWD / BWD, Side Blower 1 / 2, APBA Change',
+        'RayBuilder 리본에 헤드별 Blower 토글 추가 (PLC로 사이드 블로워 On/Off). Auto APBA 중에는 사이드 블로워 자동 On/Off',
+        '스캐너 캘리브레이션 시작 시 PLC로 캘리브레이션 실린더 전진(Head1) / 후진(Head2) 출력',
+        'Auto 모드 옵션에 Model Change 사용(Enable) 스위치 추가. 켜져 있을 때만 모델 번호가 바뀌면 RXD 파일 변경',
+        '파워 모니터링 로그에 최저 출력(CenterMin, RingMin) 추가',
+        'MES 미사용 시 Dry Run 입력이 켜져 있으면 I/O Start로 작업 시작',
+        '작업 중 서보 정위치 신호(I/O 입력 7)가 꺼지면 작업 취소 및 I/O Servo Error 로그',
+      ] },
+      { type: 'change', items: [
+        'LDD Focusing 택타임 단축: 도형 위치 이동과 자이로 센서 대기 생략, 노이즈 캘리브레이션은 한 번만 수행, 시리얼 번호 등록 없이 측정',
+        'APBA 포인트를 필드 중심 기준 격자로 배치. APBA Field Size 최소 10, Interval 최소 6으로 제한, Level Check Threshold를 mm 단위로 표기',
+        'I/O Stop / Interlock / Fire Warning 감시는 I/O 사용 또는 자동 모드일 때만 동작하고, 상태가 바뀔 때 한 번만 로그. 레이저 동작 중일 때만 작업 취소',
+        'I/O 출력은 현재 상태와 다를 때만 쓰도록 변경, End Confirm 대기(최대 10초) 중에도 I/O 감시가 멈추지 않도록 변경',
+      ] },
+      { type: 'fix', items: [
+        '파워 모니터링에서 Head2가 Head1의 레이저 소스·출력 한계값을 사용하던 문제 수정',
+        'HelioScan 알람 해제 중 들어온 알람으로 작업이 정지되던 문제 수정, Alarm Clear 중복 실행 방지',
+        'LDD APBA 창의 Laser / Guide On·Off 버튼이 다른 창 명령에 연결돼 동작하지 않던 문제 수정',
+        'MES를 사용하지 않을 때 RayRunner 시작 시 오류가 나던 문제 수정',
+      ] },
+    ],
+  },
+  {
+    date: '2025-09-15', time: '11:09', build: '1.3.1.46', types: ['add', 'change'],
+    items: [
+      'PDSensorControl에 근접 센서 1~4 입력 상태 표시 추가, Set Data I/O 항목명을 Sol 벨브로 변경',
+      'PD 센서 솔 밸브 열기/닫기 시 두 출력을 함께 On/Off하도록 변경',
+      'Dry Run 창: OK/NG 강제 선택은 I/O Start 체크 시에만 표시, Reweld 체크박스 숨김',
+      'Ajin 모션 Z축 원점 복귀 1차 검색 속도 감속 (50 → 20)',
+      'MES 미사용 시 Start + DryRun 입력으로 작업을 시작하던 동작 비활성화',
+    ],
+  },
+  {
+    date: '2025-09-12', time: '14:17', build: '1.3.1.45', types: ['change'],
+    title: '소스 저장소 등록 기준 버전',
+    items: ['RayWorkV3 1.3 소스를 Git 저장소로 관리하기 시작한 버전 (1.3.1.43 이후 이 버전까지의 세부 변경은 기록이 없음)'],
   },
   {
     date: '2025-07-31', time: '20:46', build: '1.3.1.43', types: ['fix'],
